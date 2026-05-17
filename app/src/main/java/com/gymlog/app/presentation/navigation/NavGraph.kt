@@ -1,11 +1,13 @@
 package com.gymlog.app.presentation.navigation
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.gymlog.app.presentation.viewmodel.OnboardingViewModel
 import com.gymlog.app.presentation.screens.body.BodyDataScreen
 import com.gymlog.app.presentation.screens.dashboard.DashboardScreen
 import com.gymlog.app.presentation.screens.exercise.ExerciseDetailScreen

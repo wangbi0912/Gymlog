@@ -36,39 +36,48 @@ class HistoryViewModel @Inject constructor(
 
     fun loadMonth(year: Int, month: Int) {
         viewModelScope.launch {
-            _state.update { it.copy(loading = true, selectedYear = year, selectedMonth = month) }
+            try {
+                _state.update { it.copy(loading = true, selectedYear = year, selectedMonth = month) }
 
-            val cal = Calendar.getInstance()
-            cal.set(year, month, 1, 0, 0, 0)
-            cal.set(Calendar.MILLISECOND, 0)
-            val from = cal.timeInMillis
+                val cal = Calendar.getInstance()
+                cal.set(year, month, 1, 0, 0, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                val from = cal.timeInMillis
 
-            cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59)
-            val to = cal.timeInMillis
+                cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59)
+                val to = cal.timeInMillis
 
-            val sessions = sessionRepo.getSessionsInRange(from, to)
-            val trainingDays = mutableSetOf<Int>()
-            val dayVolumes = mutableMapOf<Int, Float>()
+                val sessions = try {
+                    sessionRepo.getSessionsInRange(from, to)
+                } catch (e: Exception) {
+                    emptyList()
+                }
 
-            sessions.forEach { s ->
-                cal.timeInMillis = s.startTime
-                val day = cal.get(Calendar.DAY_OF_MONTH)
-                trainingDays.add(day)
-                dayVolumes[day] = (dayVolumes[day] ?: 0f) + s.totalVolumeKg
-            }
+                val trainingDays = mutableSetOf<Int>()
+                val dayVolumes = mutableMapOf<Int, Float>()
 
-            val maxVol = dayVolumes.values.maxOrNull() ?: 1f
+                sessions.forEach { s ->
+                    cal.timeInMillis = s.startTime
+                    val day = cal.get(Calendar.DAY_OF_MONTH)
+                    trainingDays.add(day)
+                    dayVolumes[day] = (dayVolumes[day] ?: 0f) + s.totalVolumeKg
+                }
 
-            _state.update {
-                it.copy(
-                    sessions = sessions,
-                    filteredSessions = applyFilter(sessions, it.searchQuery, it.filterBodyPart),
-                    trainingDays = trainingDays,
-                    dayVolumes = dayVolumes,
-                    maxDayVolume = maxVol,
-                    selectedDay = null,
-                    loading = false
-                )
+                val maxVol = dayVolumes.values.maxOrNull() ?: 1f
+
+                _state.update {
+                    it.copy(
+                        sessions = sessions,
+                        filteredSessions = applyFilter(sessions, it.searchQuery, it.filterBodyPart),
+                        trainingDays = trainingDays,
+                        dayVolumes = dayVolumes,
+                        maxDayVolume = maxVol,
+                        selectedDay = null,
+                        loading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(loading = false) }
             }
         }
     }

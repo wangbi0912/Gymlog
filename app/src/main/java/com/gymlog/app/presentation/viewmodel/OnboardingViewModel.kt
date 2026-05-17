@@ -14,6 +14,9 @@ class OnboardingViewModel @Inject constructor(
     private val userPrefsRepo: UserPreferencesRepository
 ) : ViewModel() {
 
+    val isOnboardingComplete: StateFlow<Boolean> = userPrefsRepo.isOnboardingComplete
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     private val _currentStep = MutableStateFlow(0)
     val currentStep: StateFlow<Int> = _currentStep
 

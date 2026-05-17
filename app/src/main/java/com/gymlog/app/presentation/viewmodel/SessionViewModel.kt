@@ -303,13 +303,17 @@ class SessionViewModel @Inject constructor(
 
                 if (s.submitForReview) {
                     try {
-                        reviewUseCase.submitReview(s.sessionId)
-                    } catch (_: Exception) { /* Review submission failed but session saved */ }
+                        val reviewId = reviewUseCase.submitReview(s.sessionId)
+                        // Execute the review immediately so user sees result
+                        reviewUseCase.executeReview(reviewId)
+                    } catch (_: Exception) {
+                        // Log but don't block session saving
+                    }
                 }
 
                 _state.update { it.copy(isActive = false, showCompleteDialog = false, savedSuccessfully = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(errorMessage = e.message) }
+                _state.update { it.copy(errorMessage = e.message, isActive = false, showCompleteDialog = false) }
             }
         }
     }

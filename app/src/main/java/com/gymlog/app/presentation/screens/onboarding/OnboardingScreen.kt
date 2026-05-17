@@ -27,6 +27,14 @@ fun OnboardingScreen(
 ) {
     val step by viewModel.currentStep.collectAsState()
     val focusManager = LocalFocusManager.current
+    val onboardingComplete by viewModel.isOnboardingComplete.collectAsState()
+
+    // Auto-navigate to dashboard if onboarding already completed
+    LaunchedEffect(onboardingComplete) {
+        if (onboardingComplete) {
+            onComplete()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.imePadding()
