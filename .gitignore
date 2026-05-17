@@ -15,3 +15,5 @@ local.properties
 *.jks
 *.keystore
 /secrets
+.claude/
+requirement*.md
