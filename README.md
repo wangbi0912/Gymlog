@@ -2,7 +2,7 @@
 
 > 你的 AI 训练伙伴 | Your AI Training Partner
 
-[![Version](https://img.shields.io/badge/version-0.1.0-lightgrey)](https://github.com/wangbi0912/GymLog)
+[![Version](https://img.shields.io/badge/version-0.1.0-lightgrey)](https://github.com/wangbi0912/Gymlog)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)
 
