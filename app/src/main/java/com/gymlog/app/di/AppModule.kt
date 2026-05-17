@@ -34,26 +34,21 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GymLogDatabase {
-        return Room.databaseBuilder(
+        val db = Room.databaseBuilder(
             context, GymLogDatabase::class.java, "gymlog.db"
-        )
-            .addCallback(object : androidx.room.RoomDatabase.Callback() {
-                override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-                    super.onCreate(db)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val database = db as? GymLogDatabase ?: return@launch
-                        val exerciseCount = database.exerciseDao().count()
-                        if (exerciseCount == 0) {
-                            database.exerciseDao().insertAll(PresetExercises.getAll())
-                            PresetTemplates.getAll().forEach { preset ->
-                                database.templateDao().insert(preset.template)
-                                database.templateDao().insertExercises(preset.exercises)
-                            }
-                        }
-                    }
+        ).build()
+
+        // Seed preset data on first create
+        CoroutineScope(Dispatchers.IO).launch {
+            if (db.exerciseDao().count() == 0) {
+                db.exerciseDao().insertAll(PresetExercises.getAll())
+                PresetTemplates.getAll().forEach { preset ->
+                    db.templateDao().insert(preset.template)
+                    db.templateDao().insertExercises(preset.exercises)
                 }
-            })
-            .build()
+            }
+        }
+        return db
     }
 
     @Provides fun provideExerciseDao(db: GymLogDatabase): ExerciseDao = db.exerciseDao()
